@@ -15,7 +15,7 @@ stage=1
 stop_stage=6
 
 # Number of jobs for data preparation
-nj=20
+nj=42
 
 # Whether the language of training data is one of Chinese and English
 is_zh_en=1
@@ -37,10 +37,11 @@ fi
 # Set `max_len` to 99% duration.
 
 # Maximum length (seconds) of the training utterance, will filter out longer utterances
-max_len=20
+#max_len=20
+max_len=30
 
 # Download directory for pre-trained models
-download_dir=download/
+download_dir=/scratch2/zipvoice/download/
 
 # We suppose you have two TSV files: "data/raw/custom_train.tsv" and 
 # "data/raw/custom_dev.tsv", where "custom" is your dataset name, 
