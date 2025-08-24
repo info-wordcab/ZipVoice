@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+csv.field_size_limit(2_147_483_647)
 import os
 import sys
 from tempfile import NamedTemporaryFile
