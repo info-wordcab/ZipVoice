@@ -167,6 +167,8 @@ def main():
     parser.add_argument("--keep-empty-text", action="store_true",
                         help="By default, entries whose text becomes empty after normalization are kept. "
                              "Enable this to keep them anyway (useful if model can handle empty text).")
+    parser.add_argument("--min-duration", type=float, default=3.0,
+                        help="Minimum cut duration (in seconds) to keep (default: 3.0)")
     args = parser.parse_args()
 
     input_is_gz = args.manifest.endswith(".gz")
@@ -190,6 +192,7 @@ def main():
     invalid_json = 0
     normalized_entries = 0
     empty_text_after_norm = 0
+    too_short_duration = 0  # new: count entries rejected by min-duration
 
     # Aggregated char-level stats
     agg_norm_stats = Counter()
@@ -223,6 +226,7 @@ def main():
 
             # Gather base stats
             sr = obj.get("recording", {}).get("sampling_rate")
+            dur = obj.get("duration")  # top-level duration of the cut
             ch = obj.get("channel")
             if isinstance(ch, list):
                 ch_key = tuple(ch)
@@ -266,6 +270,14 @@ def main():
                         # if we are not keeping empty text, treat as not matching (skip write), but still counted above
                         continue
 
+            # Filter by min duration first (must be present and >= min-duration)
+            meets_duration = (isinstance(dur, (int, float)) and dur >= args.min_duration)
+            if not meets_duration:
+                if isinstance(dur, (int, float)) and dur < args.min_duration:
+                    too_short_duration += 1
+                # If duration is missing or too short, skip
+                continue
+
             # Filter by target sampling_rate and channel (same logic as before)
             if sr == args.target_sampling_rate and ch == target_channel:
                 kept += 1
@@ -306,13 +318,15 @@ def main():
 
     print(f"\nEntries with empty text after normalization: {empty_text_after_norm}"
           f" ({'kept' if args.keep_empty_text else 'not kept when filtering condition fails'})")
+    print(f"Entries skipped for duration < {args.min_duration:.2f}s: {too_short_duration}")
 
     if args.fix:
         pct = (kept / max(1, (total))) * 100.0
         print(f"\nOriginal manifest moved to: {backup_path}")
         print(f"Filtered+cleaned manifest written to: {args.manifest}")
         print(f"Kept {kept} / {total} entries ({pct:.2f}%) "
-              f"matching sampling_rate={args.target_sampling_rate}, channel={target_channel}")
+              f"matching sampling_rate={args.target_sampling_rate}, channel={target_channel}, "
+              f"duration>={args.min_duration:.2f}s")
     else:
         print("\n(Run with --fix to write a cleaned, filtered manifest.)")
 
