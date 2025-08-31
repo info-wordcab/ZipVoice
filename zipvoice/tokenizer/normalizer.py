@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import cn2an
 import inflect
 
+from nemo_text_processing.text_normalization.normalize import Normalizer as NemoNormalizer
 
 class TextNormalizer(ABC):
     """Abstract base class for text normalization, defining common interface."""
@@ -15,6 +16,29 @@ class TextNormalizer(ABC):
 
 
 class EnglishTextNormalizer(TextNormalizer):
+    """
+    English WFST normalizer backed by NVIDIA NeMo.
+
+    - Uses cased input (keeps original casing of non-expanded tokens)
+    - Deterministic output
+    - Preserves punctuation
+    - Expands numbers, currencies, ordinals, fractions, percents, common abbreviations, etc.
+
+    pip install nemo_text_processing pynini
+    """
+
+    def __init__(self, deterministic: bool = True):
+        # NeMo will keep punctuation with preserve_punct=True and keep casing with input_case="cased"
+        self._normalizer = NemoNormalizer(
+            lang="en",
+            input_case="cased",
+            deterministic=deterministic,
+        )
+
+    def normalize(self, text: str) -> str:
+        return self._normalizer.normalize(text)
+
+class EnglishTextNormalizerOld(TextNormalizer):
     """
     A class to handle preprocessing of English text including normalization. Following:
     https://github.com/espnet/espnet_tts_frontend/blob/master/tacotron_cleaner/cleaners.py
