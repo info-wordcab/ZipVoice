@@ -78,8 +78,8 @@ def main():
         help="FFT size used in your STFT frontend (default: 1024)."
     )
     p.add_argument(
-        "--target-sr", type=int, default=16000,
-        help="Target sample rate expected by the model/frontend (default: 16000)."
+        "--target-sr", type=int, default=24000,
+        help="Target sample rate expected by the model/frontend (default: 24000)."
     )
     p.add_argument(
         "--pad-mode", choices=["reflect", "replicate", "constant"], default="reflect",
