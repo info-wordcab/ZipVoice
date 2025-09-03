@@ -14,11 +14,13 @@ set -o pipefail
 #stage=1
 #stop_stage=6
 
-stage=7
-stop_stage=7
+stage=1
+stop_stage=5
 
 # Number of jobs for data preparation
 nj=144
+numgpu=4
+numiters=50000
 
 # Whether the language of training data is one of Chinese and English
 is_zh_en=1
@@ -98,6 +100,9 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
       done
       # The output manifest files are "data/manifests/custom-finetune_cuts_train.jsonl.gz".
       # and "data/manifests/custom-finetune_cuts_dev.jsonl.gz".
+      echo "Filter short files in manifest"
+      python3 local_wordcab/filter_manifest.py --target-sr 24000 --check-supervisions --min-seconds 3.0 data/manifests/custom-finetune_cuts_train.jsonl.gz
+      python3 local_wordcab/filter_manifest.py --target-sr 24000 --check-supervisions --min-seconds 3.0 data/manifests/custom-finetune_cuts_dev.jsonl.gz
 fi
 
 if [ $stage -le 3 ] && [ $stop_stage -ge 3 ]; then
@@ -138,11 +143,11 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
       #  --base-lr 0.0001
 
       python3 -m zipvoice.bin.train_zipvoice \
-            --world-size 4 \
+            --world-size ${numgpu} \
             --use-fp16 1 \
             --finetune 1 \
             --base-lr 0.00005 \
-            --num-iters 100000 \
+            --num-iters ${numiters} \
             --save-every-n 1000 \
             --max-duration 500 \
             --max-len ${max_len} \
@@ -161,7 +166,7 @@ fi
 if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
       echo "Stage 6: Average the checkpoints for ZipVoice"
       python3 -m zipvoice.bin.generate_averaged_model \
-            --iter 10000 \
+            --iter ${numiters} \
             --avg 2 \
             --model-name zipvoice \
             --exp-dir exp/zipvoice_finetune
@@ -181,5 +186,5 @@ if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
             --lang ${lang} \
             --test-list test.tsv \
             --res-dir results/test_finetune\
-            --num-step 16
+            --num-step 20 #16
 fi
