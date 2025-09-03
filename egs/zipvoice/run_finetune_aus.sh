@@ -21,6 +21,7 @@ stop_stage=5
 nj=144
 numgpu=4
 numiters=50000
+expdir=exp/zipvoice_finetune/
 
 # Whether the language of training data is one of Chinese and English
 is_zh_en=1
@@ -47,6 +48,9 @@ max_len=30
 
 # Download directory for pre-trained models
 download_dir=/srv/zipvoice/download/
+
+echo download_dir: $download_dir
+echo expdir: $expdir
 
 # We suppose you have two TSV files: "data/raw/custom_train.tsv" and 
 # "data/raw/custom_dev.tsv", where "custom" is your dataset name, 
@@ -159,7 +163,7 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
             --dataset custom \
             --train-manifest data/fbank/custom-finetune_cuts_train.jsonl.gz \
             --dev-manifest data/fbank/custom-finetune_cuts_dev.jsonl.gz \
-            --exp-dir exp/zipvoice_finetune
+            --exp-dir ${expdir}
 
 fi
 
@@ -169,8 +173,8 @@ if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
             --iter ${numiters} \
             --avg 2 \
             --model-name zipvoice \
-            --exp-dir exp/zipvoice_finetune
-      # The generated model is exp/zipvoice_finetune/iter-10000-avg-2.pt
+            --exp-dir ${expdir}
+      # The generated model is exp/zipvoice_finetune/iter-${numiters}-avg-2.pt
 fi
 
 ### Inference with PyTorch models (7)
@@ -180,8 +184,8 @@ if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
 
       python3 -m zipvoice.bin.infer_zipvoice \
             --model-name zipvoice \
-            --model-dir exp/zipvoice_finetune/ \
-            --checkpoint-name iter-10000-avg-2.pt \
+            --model-dir ${expdir} \
+            --checkpoint-name iter-${numiters}-avg-2.pt \
             --tokenizer ${tokenizer} \
             --lang ${lang} \
             --test-list test.tsv \
