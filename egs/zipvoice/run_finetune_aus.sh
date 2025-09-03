@@ -11,11 +11,14 @@ set -e
 set -u
 set -o pipefail
 
-stage=1
-stop_stage=6
+#stage=1
+#stop_stage=6
+
+stage=7
+stop_stage=7
 
 # Number of jobs for data preparation
-nj=42
+nj=144
 
 # Whether the language of training data is one of Chinese and English
 is_zh_en=1
@@ -41,7 +44,7 @@ fi
 max_len=30
 
 # Download directory for pre-trained models
-download_dir=/scratch2/zipvoice/download/
+download_dir=/srv/zipvoice/download/
 
 # We suppose you have two TSV files: "data/raw/custom_train.tsv" and 
 # "data/raw/custom_dev.tsv", where "custom" is your dataset name, 
@@ -73,6 +76,10 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
       done
       # The output manifest files are "data/manifests/custom-finetune_cuts_raw_train.jsonl.gz".
       # and "data/manifests/custom-finetune_cuts_raw_dev.jsonl.gz".
+
+      #echo "Filtering manifest with local_wordcab/check_manifest2.py"
+      #python3 local_wordcab/check_manifest2.py --fix data/manifests/custom-finetune_cuts_raw_dev.jsonl.gz 
+      #python3 local_wordcab/check_manifest2.py --fix data/manifests/custom-finetune_cuts_raw_train.jsonl.gz 
 fi
 
 
@@ -86,7 +93,8 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
                   --input-file data/manifests/custom-finetune_cuts_raw_${subset}.jsonl.gz \
                   --output-file data/manifests/custom-finetune_cuts_${subset}.jsonl.gz \
                   --tokenizer ${tokenizer} \
-                  --lang ${lang}
+                  --lang ${lang} \
+	          --num-jobs ${nj}
       done
       # The output manifest files are "data/manifests/custom-finetune_cuts_train.jsonl.gz".
       # and "data/manifests/custom-finetune_cuts_dev.jsonl.gz".
@@ -126,12 +134,15 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
 
       [ -z "$max_len" ] && { echo "Error: max_len is not set!" >&2; exit 1; }
 
+      # --num-iters 10000
+      #  --base-lr 0.0001
+
       python3 -m zipvoice.bin.train_zipvoice \
             --world-size 4 \
             --use-fp16 1 \
             --finetune 1 \
-            --base-lr 0.0001 \
-            --num-iters 10000 \
+            --base-lr 0.00005 \
+            --num-iters 100000 \
             --save-every-n 1000 \
             --max-duration 500 \
             --max-len ${max_len} \
