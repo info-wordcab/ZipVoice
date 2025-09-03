@@ -139,6 +139,15 @@ PROMPTS = OrderedDict(
             "The other day I was out on a morning walk when I spotted a mob of kangaroos hopping across the paddock. "
             "You don’t see that every day unless you’re out bush, but it’s a reminder of how special this country really is.",
         ),
+        (
+             "customspeech9",
+             "Out in the wilds of the interwebs, there roams a fierce creature known only as DragonScarlet. "
+             "Don’t be fooled by her graceful looks - this sheila’s a dead-set apex predator in the world of shooters. "
+             "One moment you’re wandering about, thinking you’re safe... next moment? Bam! "
+             "You’re flat on your back, tears in your eyes, wonderin’ what just happened. "
+             "She stalks noobs like a saltie stalks tourists on the riverbank - silent, patient, and then snap! "
+             "It’s game over, mate.",
+        ),
     ]
 )
 

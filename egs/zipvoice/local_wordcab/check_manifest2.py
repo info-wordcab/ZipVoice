@@ -49,6 +49,7 @@ _PUNCT_MAP = {
     "•": "*", "·": "*", "‧": "*",
     "▪": "*", "◦": "*",
     "→": "->", "←": "<-", "↔": "<->", "⇒": "=>", "⇐": "<=",
+    "°": " degree ", "‰": " per mille ", "₹": " Rupees ", "€": " Euro ",
     # rare spaces (handled below too, but safe to map)
     "\u00A0": " ",  # NBSP
     "\u2009": " ",  # THIN SPACE
