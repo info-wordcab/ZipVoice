@@ -22,35 +22,6 @@ from pathlib import Path
 # Hardcoded data (edit freely)
 # ----------------------------
 
-# Voices: each has a 'name', a 'prompt_wav' path, and the 'prompt_transcription'
-VOICES = [
-    {
-        "name": "irwin",
-        "prompt_wav": "irwin.wav",
-        "prompt_transcription": (
-            "The seed that the parrot kicks out of its cage attracts mice and mice are what the snake's here for. "
-            "Try a different kind of cage and hey, no mice and no snakes. With me out of the way, the snake comes out "
-            "to look for breakfast. Mice find their food by sniffing the air. Mice use scent too, but they don't use their nostrils."
-        ),
-    },
-    {
-        "name": "albonese",
-        "prompt_wav": "albonese.wav",
-        "prompt_transcription": (
-            "But as a fundamental priority for our economy and our society. And Australians voted for a Labor government "
-            "to keep delivering real and lasting help with their cost of living."
-        ),
-    },
-    {
-        "name": "david",
-        "prompt_wav": "david.wav",
-        "prompt_transcription": (
-            "Thanks, everyone. So, again, yeah, look, let's get into it. We're here today to talk about Big Tin Can's view "
-            "of how we can create what we call a single pane of glass, the employee store experience, with the simple goal "
-            "that we want every human."
-        ),
-    },
-]
 
 # Voices: each has a 'name', a 'prompt_wav' path, and the 'prompt_transcription'
 VOICES = [
